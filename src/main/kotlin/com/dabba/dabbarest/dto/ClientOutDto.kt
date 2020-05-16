@@ -4,7 +4,7 @@ import io.swagger.annotations.ApiModel
 
 @ApiModel
 data class ClientOutDto(
-        val id:Long,
+        val id: Long?,
         val name:String,
         val surname:String,
         val address:String,

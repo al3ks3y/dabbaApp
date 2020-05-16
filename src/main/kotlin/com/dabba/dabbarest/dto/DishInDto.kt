@@ -9,6 +9,5 @@ data class DishInDto (
         val pictureUrl:String?,
         val weigh:Int,
         val price:Int,
-        val description:String,
-        val comments:String
+        val description: String
 )

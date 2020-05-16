@@ -3,6 +3,7 @@ package com.dabba.dabbarest.dto
 import com.dabba.dabbarest.model.KitchenType
 
 data class RestaurantOutDto(
+        val id: Long?,
         val name: String,
         val address: String,
         val kitchenType: KitchenType,

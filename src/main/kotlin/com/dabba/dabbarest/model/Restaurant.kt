@@ -1,35 +1,33 @@
 package com.dabba.dabbarest.model
 
-import com.dabba.dabbarest.dto.DishInDto
-import com.dabba.dabbarest.dto.DishOutDto
-import com.dabba.dabbarest.dto.RestaurantInDto
-import com.dabba.dabbarest.dto.RestaurantOutDto
+import com.dabba.dabbarest.dto.*
 import com.fasterxml.jackson.annotation.JsonProperty
 import io.swagger.annotations.ApiModel
+import lombok.NoArgsConstructor
 import org.hibernate.validator.constraints.Length
-import java.util.*
 import javax.persistence.*
 
 @Entity
 @ApiModel
+@NoArgsConstructor
 @Table(name = "restaurant")
 data class Restaurant (
         @Id
         @JsonProperty("id")
         @Column(name = "id")
         @GeneratedValue(strategy = GenerationType.AUTO)
-        val id: Long = 0L,
-        val name: String,
-        val address:String,
-        val kitchenType: KitchenType,
-        val openTime: String,
-        val closeTime: String,
-        val contactPhone:String,
-        val logoUrl:String,
-        val email:String,
-        val serviceRadius:Double,
+        var id: Long = 0L,
+        var name: String,
+        var address: String,
+        var kitchenType: KitchenType,
+        var openTime: String,
+        var closeTime: String,
+        var contactPhone: String,
+        var logoUrl: String,
+        var email: String,
+        var serviceRadius: Double,
         @OneToMany(cascade = [CascadeType.ALL])
-        val dishes:MutableList<Dish> =Collections.emptyList()
+        var dishes: MutableList<Dish> = mutableListOf()
 )
 {
     fun addDish(dish: Dish):Unit {
@@ -37,7 +35,14 @@ data class Restaurant (
         this.dishes.add(dish)
     }
 
+    fun getDish(id: Long): Dish? {
+        if (this.dishes.filter { it.id == id }.size == 1) {
+            return this.dishes.filter { it.id == id }[0]
+        } else return null
+    }
+
     fun toDto(): RestaurantOutDto = RestaurantOutDto(
+            id = this.id,
             name = this.name,
             address = this.address,
             kitchenType = this.kitchenType,
@@ -50,6 +55,18 @@ data class Restaurant (
             logoUrl = this.logoUrl
     )
 
+    constructor(name: String, address: String, kitchenType: KitchenType, openTime: String, closeTime: String, contactPhone: String, logoUrl: String, email: String, serviceRadius: Double)
+            : this(0, "", "", KitchenType.RUSSIAN, "", "", "", "", "", 1.0, mutableListOf()) {
+        this.name = name
+        this.address = address
+        this.kitchenType = kitchenType
+        this.openTime = openTime
+        this.closeTime = closeTime
+        this.contactPhone = contactPhone
+        this.logoUrl = logoUrl
+        this.email = email
+        this.serviceRadius = serviceRadius
+    }
     companion object {
         fun fromDto(dto: RestaurantInDto): Restaurant = Restaurant(
                 name = dto.name,
@@ -75,14 +92,15 @@ data class Dish (
         @JsonProperty("id")
         @Column(name = "id")
         @GeneratedValue(strategy = GenerationType.AUTO)
-        private val id: Long = 0L,
+        internal val id: Long? = 0L,
         val name:String,
         @Length(max = 800)
         val pictureUrl:String?,
         val weigh:Int,
         val price:Int,
         val description:String,
-        val comments: String?
+        @OneToMany(cascade = [CascadeType.ALL])
+        var extras: MutableList<Extra> = mutableListOf()
 ){
     companion object{
         fun fromDto(dishInDto: DishInDto):Dish= Dish(
@@ -90,23 +108,49 @@ data class Dish (
                 name = dishInDto.name,
                 pictureUrl = dishInDto.pictureUrl,
                 weigh = dishInDto.weigh,
-                comments = dishInDto.comments,
                 price = dishInDto.price,
                 restaurant = null
         )
     }
 
     fun toDto(): DishOutDto = DishOutDto(
+            id = this.id,
             name = this.name,
             description = this.description,
-            comments = this.comments,
             pictureUrl = this.pictureUrl,
             price = this.price,
-            weigh = this.weigh
+            weigh = this.weigh,
+            extras = this.extras.map { it.toDto() }.toMutableList()
     )
 
-
+    fun addExtra(extra: Extra): Unit {
+        extra.dish = this
+        this.extras.add(extra)
+    }
 }
+
+@ApiModel
+@Entity
+data class Extra(
+        @Id
+        @JsonProperty("id")
+        @Column(name = "id")
+        @GeneratedValue(strategy = GenerationType.AUTO)
+        private val id: Long? = 0L,
+        @ManyToOne
+        @JoinColumn(name = "dishid")
+        var dish: Dish?,
+        var name: String,
+        var price: Int,
+        var status: Boolean
+) {
+    fun toDto() = ExtraOutDto(id, name, price, status)
+
+    companion object {
+        fun fromDto(extraInDto: ExtraInDto) = Extra(null, null, extraInDto.name, extraInDto.price, false)
+    }
+}
+
 @ApiModel
 enum class KitchenType {
     RUSSIAN,
