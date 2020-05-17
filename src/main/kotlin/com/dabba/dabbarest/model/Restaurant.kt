@@ -68,7 +68,7 @@ data class Restaurant (
         this.serviceRadius = serviceRadius
     }
     companion object {
-        fun fromDto(dto: RestaurantInDto): Restaurant = Restaurant(
+        fun fromDto(dto: RestaurantInDto, fileName: String?): Restaurant = Restaurant(
                 name = dto.name,
                 address = dto.address,
                 openTime = dto.openTime,
@@ -76,7 +76,7 @@ data class Restaurant (
                 contactPhone = dto.contactPhone,
                 email = dto.email,
                 serviceRadius = dto.serviceRadius,
-                logoUrl = dto.logoUrl,
+                logoUrl = fileName,
                 kitchenType = KitchenType.fromString(dto.kitchenType)
         )
     }
@@ -103,10 +103,10 @@ data class Dish (
         var extras: MutableList<Extra> = mutableListOf()
 ){
     companion object{
-        fun fromDto(dishInDto: DishInDto):Dish= Dish(
+        fun fromDto(dishInDto: DishInDto, fileName: String?): Dish = Dish(
                 description = dishInDto.description,
                 name = dishInDto.name,
-                pictureUrl = dishInDto.picture.toString(),
+                pictureUrl = fileName,
                 weigh = dishInDto.weigh,
                 price = dishInDto.price,
                 restaurant = null

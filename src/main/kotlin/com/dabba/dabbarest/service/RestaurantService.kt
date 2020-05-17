@@ -15,6 +15,7 @@ import org.springframework.web.multipart.MultipartFile
 import java.io.BufferedOutputStream
 import java.io.File
 import java.io.FileOutputStream
+import java.nio.charset.Charset
 import java.util.*
 import javax.transaction.Transactional
 
@@ -24,6 +25,7 @@ import javax.transaction.Transactional
 class RestaurantService(private val restaurantDao: RestaurantDao) {
     companion object {
         val ACCESS_TOKEN: String = "XE23suSLwdAAAAAAAAAAQslEd3QQGfP0URLqF05Gfh6pYK3ujmiPqmIB0xv-y2Ki"
+
     }
     fun findByName(name: String): MutableList<RestaurantOutDto> = restaurantDao.findByName(name.toUpperCase()).map { it.toDto() }.toMutableList()
     fun getAll(): MutableList<RestaurantOutDto> {
@@ -31,11 +33,20 @@ class RestaurantService(private val restaurantDao: RestaurantDao) {
         return restaurantList.map { it.toDto() }.toMutableList()
     }
 
-    fun add(restaurant: RestaurantInDto) = restaurantDao.save(Restaurant.fromDto(restaurant))
-    fun addDish(dishInDto: DishInDto) {
+    fun add(restaurant: RestaurantInDto, multipartFile: MultipartFile?) = restaurantDao.save(Restaurant.fromDto(restaurant, uploadFileAndGetName(multipartFile))).id
+    fun addDish(dishInDto: DishInDto, multipartFile: MultipartFile?): Long? {
+        val restaurant: Restaurant = restaurantDao.findById(dishInDto.restaurantId).orElseThrow { NotFoundException("Ресторан с таким id не найден") }
+        restaurant.addDish(Dish.fromDto(dishInDto, uploadFileAndGetName(multipartFile)))
+        return restaurantDao.save(restaurant).dishes.last().id
+    }
+
+    fun addDish(dishInDto: DishInDto): Long? {
+        val byteArray = ByteArray(2); // length is bounded by 7
+        Random().nextBytes(byteArray);
+        val generatedString = String(byteArray, Charset.forName("UTF-8"))
         val restaurant:Restaurant= restaurantDao.findById(dishInDto.restaurantId).orElseThrow{NotFoundException("Ресторан с таким id не найден")}
-        restaurant.addDish(Dish.fromDto(dishInDto))
-        restaurantDao.save(restaurant)
+        restaurant.addDish(Dish.fromDto(dishInDto, generatedString))
+        return restaurantDao.save(restaurant).dishes.last().id
     }
 
     fun addExtra(extraInDto: ExtraInDto) {
@@ -51,22 +62,21 @@ class RestaurantService(private val restaurantDao: RestaurantDao) {
     fun findById(id:Long): Optional<Restaurant> =restaurantDao.findById(id)
     fun deleteRestaurant(id:Long)=restaurantDao.delete(findById(id).orElseThrow{NotFoundException("Ресторан с таким id не найден")})
 
-    fun uploadFileAndGetName(file: MultipartFile?): String {
-        Dish
+    fun uploadFileAndGetName(file: MultipartFile?): String? {
         if (file != null) {
-            val name: String = file.name
+            val desktop = System.getProperty("user.home")
+            val name: String = "$desktop/${file.name}" + "${Math.random()}"
             try {
                 val bytes: ByteArray = file.bytes
-                val desktop = System.getProperty("user.home")
-                val stream = BufferedOutputStream(FileOutputStream(File("$name-uploaded")));
-                stream.write(bytes);
-                stream.close();
-                return "Вы удачно загрузили $name в $name-uploaded !";
+                val stream = BufferedOutputStream(FileOutputStream(File(name)))
+                stream.write(bytes)
+                stream.close()
+                return name
             } catch (e: Exception) {
                 return "Вам не удалось загрузить " + name + " => " + e.message;
             }
         } else {
-            return "Вам не удалось загрузить файл, потому что файл пустой.";
+            return null
         }
     }
 

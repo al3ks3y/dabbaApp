@@ -45,8 +45,6 @@ dependencies {
 	testImplementation("junit:junit:4.13")
 	testImplementation("com.h2database:h2:1.4.191")
 	implementation("com.dropbox.core:dropbox-core-sdk:3.1.3")
-	implementation("org.springframework.boot:spring-boot-starter-security")
-	implementation("org.springframework.security:spring-security-test")
 }
 
 tasks.withType<Test> {

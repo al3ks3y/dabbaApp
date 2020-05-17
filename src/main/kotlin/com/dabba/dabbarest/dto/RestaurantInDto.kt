@@ -2,7 +2,7 @@ package com.dabba.dabbarest.dto
 
 import io.swagger.annotations.ApiModel
 
-@ApiModel
+@ApiModel("Объект для создания ресторана")
 data class RestaurantInDto(
         val name: String,
         val address: String,
@@ -10,7 +10,7 @@ data class RestaurantInDto(
         val openTime: String,
         val closeTime: String,
         val contactPhone: String,
-        val logoUrl: String,
+        val logoUrl: String?,
         val email: String,
         val serviceRadius: Double
 )
