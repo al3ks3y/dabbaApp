@@ -44,7 +44,9 @@ dependencies {
 	implementation("io.springfox:springfox-swagger-ui:2.8.0")
 	testImplementation("junit:junit:4.13")
 	testImplementation("com.h2database:h2:1.4.191")
-    implementation("joda-time:joda-time:2.10.6")
+	implementation("com.dropbox.core:dropbox-core-sdk:3.1.3")
+	implementation("org.springframework.boot:spring-boot-starter-security")
+	implementation("org.springframework.security:spring-security-test")
 }
 
 tasks.withType<Test> {

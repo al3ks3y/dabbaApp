@@ -23,7 +23,7 @@ data class Restaurant (
         var openTime: String,
         var closeTime: String,
         var contactPhone: String,
-        var logoUrl: String,
+        var logoUrl: String?,
         var email: String,
         var serviceRadius: Double,
         @OneToMany(cascade = [CascadeType.ALL])
@@ -55,7 +55,7 @@ data class Restaurant (
             logoUrl = this.logoUrl
     )
 
-    constructor(name: String, address: String, kitchenType: KitchenType, openTime: String, closeTime: String, contactPhone: String, logoUrl: String, email: String, serviceRadius: Double)
+    constructor(name: String, address: String, kitchenType: KitchenType, openTime: String, closeTime: String, contactPhone: String, logoUrl: String?, email: String, serviceRadius: Double)
             : this(0, "", "", KitchenType.RUSSIAN, "", "", "", "", "", 1.0, mutableListOf()) {
         this.name = name
         this.address = address
@@ -106,7 +106,7 @@ data class Dish (
         fun fromDto(dishInDto: DishInDto):Dish= Dish(
                 description = dishInDto.description,
                 name = dishInDto.name,
-                pictureUrl = dishInDto.pictureUrl,
+                pictureUrl = dishInDto.picture.toString(),
                 weigh = dishInDto.weigh,
                 price = dishInDto.price,
                 restaurant = null

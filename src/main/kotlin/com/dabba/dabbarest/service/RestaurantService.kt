@@ -11,12 +11,20 @@ import com.dabba.dabbarest.model.KitchenType
 import com.dabba.dabbarest.model.Restaurant
 import javassist.NotFoundException
 import org.springframework.stereotype.Service
+import org.springframework.web.multipart.MultipartFile
+import java.io.BufferedOutputStream
+import java.io.File
+import java.io.FileOutputStream
 import java.util.*
 import javax.transaction.Transactional
+
 
 @Service
 @Transactional
 class RestaurantService(private val restaurantDao: RestaurantDao) {
+    companion object {
+        val ACCESS_TOKEN: String = "XE23suSLwdAAAAAAAAAAQslEd3QQGfP0URLqF05Gfh6pYK3ujmiPqmIB0xv-y2Ki"
+    }
     fun findByName(name: String): MutableList<RestaurantOutDto> = restaurantDao.findByName(name.toUpperCase()).map { it.toDto() }.toMutableList()
     fun getAll(): MutableList<RestaurantOutDto> {
         val restaurantList = restaurantDao.findAll()
@@ -43,6 +51,27 @@ class RestaurantService(private val restaurantDao: RestaurantDao) {
     fun findById(id:Long): Optional<Restaurant> =restaurantDao.findById(id)
     fun deleteRestaurant(id:Long)=restaurantDao.delete(findById(id).orElseThrow{NotFoundException("Ресторан с таким id не найден")})
 
+    fun uploadFileAndGetName(file: MultipartFile?): String {
+        Dish
+        if (file != null) {
+            val name: String = file.name
+            try {
+                val bytes: ByteArray = file.bytes
+                val desktop = System.getProperty("user.home")
+                val stream = BufferedOutputStream(FileOutputStream(File("$name-uploaded")));
+                stream.write(bytes);
+                stream.close();
+                return "Вы удачно загрузили $name в $name-uploaded !";
+            } catch (e: Exception) {
+                return "Вам не удалось загрузить " + name + " => " + e.message;
+            }
+        } else {
+            return "Вам не удалось загрузить файл, потому что файл пустой.";
+        }
+    }
+
+
+
     fun initTestDb() {
         val pjons = Restaurant(
                 "Папа Джонс",
@@ -51,7 +80,7 @@ class RestaurantService(private val restaurantDao: RestaurantDao) {
                 "9:00",
                 "23:00",
                 "+7(495)123-12-34",
-                "https://nsk.zakazaka.ru/db/674/587/org703.jpg",
+                null,
                 "order@papajohns.ru",
                 20.0
         )
@@ -59,22 +88,22 @@ class RestaurantService(private val restaurantDao: RestaurantDao) {
         val pjonsid = findByName("Папа")[0].id!!
         addDish(DishInDto(pjonsid,
                 "Пицца Маргарита",
-                "https://cdn.dodostatic.net/static/Img/Products/Pizza/ru-RU/2869bdc5-4370-4703-8a84-871b8bc66d60.jpg",
+                null,
                 300, 450,
                 "Итальянские травы, томатный соус, моцарелла, томаты"))
         addDish(DishInDto(pjonsid,
                 "Пицца Мексиканская",
-                "https://cdn.dodostatic.net/static/Img/Products/Pizza/ru-RU/ecd9d5b3-0cfc-4138-9559-18d9631fe8aa.jpg",
+                null,
                 380, 550,
                 "Цыпленок, томатный соус, сладкий перец, красный лук, моцарелла, острый халапеньо, томаты, соус сальса"))
         addDish(DishInDto(pjonsid,
                 "Пицца Пепперони",
-                "https://cdn.dodostatic.net/static/Img/Products/Pizza/ru-RU/accc2ec9-5a93-4fb4-94bf-9006ce23fede.jpg",
+                null,
                 350, 520,
                 "Пикантная пепперони, томатный соус, моцарелла"))
         addDish(DishInDto(pjonsid,
                 "Пицца Овощи и грибы",
-                "https://cdn.dodostatic.net/static/Img/Products/Pizza/ru-RU/743b12bc-5fbf-4872-8eaa-728b2709ccbf.jpg",
+                null,
                 410, 545,
                 "Итальянские травы, томатный соус, кубики брынзы, шампиньоны, сладкий перец, красный лук, моцарелла, маслины, томаты"))
         val sushi = Restaurant(
@@ -84,7 +113,7 @@ class RestaurantService(private val restaurantDao: RestaurantDao) {
                 "9:30",
                 "22:30",
                 "+7(495)123-12-34",
-                "https://png.pngtree.com/templates/md/20180621/md_5b2bb63471cc0.jpg",
+                null,
                 "order@tastysushi.ru",
                 4.5
         )
@@ -92,22 +121,22 @@ class RestaurantService(private val restaurantDao: RestaurantDao) {
         val sushiId = findByName("вкусные")[0].id!!
         addDish(DishInDto(sushiId,
                 "Унаги ролл",
-                "https://static.yakitoriya.ru/media/cache/9e/a0/9ea01d9e779cd505070c30c153d019a3.jpg",
+                null,
                 95, 110,
                 "Рис для суси, угорь, васаби, кунжут, водоросли прессованные"))
         addDish(DishInDto(sushiId,
                 "Тори унаги",
-                "https://static.yakitoriya.ru/media/cache/ec/76/ec76a9c45aaa47e3380a8e6ee5ddee6c.jpg",
+                null,
                 85, 95,
                 "Рис для суси, фарш (куриная грудка майонез, угорь, икра сельди), васаби, водоросли прессованные"))
         addDish(DishInDto(sushiId,
                 "Вакамэ сарада",
-                "https://static.yakitoriya.ru/media/cache/cf/b4/cfb4160204f0cf2b46e9cb5a5adc8bc7.jpg",
+                null,
                 100, 90,
                 "Рис для суси, маринованные водоросли, васаби, водоросли прессованные"))
         addDish(DishInDto(sushiId,
                 "Калифорния ролл",
-                "https://static.yakitoriya.ru/media/cache/ce/3c/ce3c4e740ed0860816435da65f76bbcf.jpg",
+                null,
                 100, 90,
                 "Рис для суси, крабовое мясо, икра летучей рыбы, майонез, огурцы, авокадо, васаби, водоросли прессованные (8 шт.)"))
 
@@ -118,7 +147,7 @@ class RestaurantService(private val restaurantDao: RestaurantDao) {
                 "10:30",
                 "22:00",
                 "+7(495)123-12-34",
-                "https://is2-ssl.mzstatic.com/image/thumb/Purple113/v4/e5/f6/7f/e5f67f5f-7dd1-f535-58aa-93a8216231a7/AppIcon-1x_U007emarketing-0-6-0-0-85-220.png/246x0w.png",
+                null,
                 "order@tacobell.ru",
                 18.5
         )
@@ -126,12 +155,12 @@ class RestaurantService(private val restaurantDao: RestaurantDao) {
         val tacoId = findByName("Тако")[0].id!!
         addDish(DishInDto(tacoId,
                 "Чикен тако",
-                "https://www.thegardengrazer.com/wp-content/uploads/2019/10/easy-vegan-taco-crumbles-650-wm.jpg",
+                null,
                 195, 350,
                 "Пшеничная тортилья, курица, специи (лук, чеснок, кумин, кориандр, куркума, сахар, яблоко, тамаринд), соус «Тако», соус «Чили», салат «Романо», сыр «Чеддер»"))
         addDish(DishInDto(tacoId,
                 "Чикен буррито",
-                "https://imagesvc.meredithcorp.io/v3/mm/image?url=https%3A%2F%2Fcdn-image.myrecipes.com%2Fsites%2Fdefault%2Ffiles%2Fstyles%2F4_3_horizontal_-_1200x900%2Fpublic%2Fchicken-fried-rice-burrito-dcms-large-image.jpg%3Fitok%3DLZ_UKbrX",
+                null,
                 195, 350,
                 "Пшеничная тортилья, курица, специи (лук, чеснок, кумин, кориандр, куркума, сахар, яблоко, тамаринд), рис, соус «Тако», соус «Чили», сыр «Чеддер»"))
 

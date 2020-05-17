@@ -10,7 +10,7 @@ data class RestaurantOutDto(
         val openTime: String,
         val closeTime: String,
         val contactPhone: String,
-        val logoUrl: String,
+        val logoUrl: String?,
         val email: String,
         val serviceRadius: Double,
         val dishes: MutableList<DishOutDto>
