@@ -12,5 +12,6 @@ data class RestaurantInDto(
         val contactPhone: String,
         val logoUrl: String?,
         val email: String,
-        val serviceRadius: Double
+        val coordinates: String,
+        val link: String?
 )

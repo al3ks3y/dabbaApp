@@ -23,14 +23,15 @@ import javax.transaction.Transactional
 @Service
 @Transactional
 class RestaurantService(private val restaurantDao: RestaurantDao) {
-    companion object {
-        val ACCESS_TOKEN: String = "XE23suSLwdAAAAAAAAAAQslEd3QQGfP0URLqF05Gfh6pYK3ujmiPqmIB0xv-y2Ki"
 
-    }
     fun findByName(name: String): MutableList<RestaurantOutDto> = restaurantDao.findByName(name.toUpperCase()).map { it.toDto() }.toMutableList()
     fun getAll(): MutableList<RestaurantOutDto> {
         val restaurantList = restaurantDao.findAll()
         return restaurantList.map { it.toDto() }.toMutableList()
+    }
+
+    fun findById(id: Long): RestaurantOutDto {
+        return restaurantDao.findById(id).orElseThrow { NotFoundException("Ресторан с таким id не найден") }.toDto()
     }
 
     fun add(restaurant: RestaurantInDto, multipartFile: MultipartFile?) = restaurantDao.save(Restaurant.fromDto(restaurant, uploadFileAndGetName(multipartFile))).id
@@ -59,8 +60,8 @@ class RestaurantService(private val restaurantDao: RestaurantDao) {
     fun findDishById(dishId: Long): Dish? = restaurantDao.findAll().filter { it.dishes.filter { dish -> dish.id == dishId }.size == 1 }[0].getDish(dishId)
     fun deleteDishById(id: Long) {
     }
-    fun findById(id:Long): Optional<Restaurant> =restaurantDao.findById(id)
-    fun deleteRestaurant(id:Long)=restaurantDao.delete(findById(id).orElseThrow{NotFoundException("Ресторан с таким id не найден")})
+
+    fun deleteRestaurant(id: Long) = restaurantDao.delete(restaurantDao.findById(id).orElseThrow { NotFoundException("Ресторан с таким id не найден") })
 
     fun uploadFileAndGetName(file: MultipartFile?): String? {
         if (file != null) {
@@ -80,6 +81,14 @@ class RestaurantService(private val restaurantDao: RestaurantDao) {
         }
     }
 
+    fun setRadius(id: Long, radius: Double) {
+        val restaurant = restaurantDao.findById(id).orElseThrow { NotFoundException("Ресторан с таким id не найден") }
+        restaurant.serviceRadius = radius
+    }
+
+    fun findByLink(link: String): RestaurantOutDto {
+        return restaurantDao.findByLink(link).orElseThrow { NotFoundException("Ресторан с таким link не найден") }.toDto()
+    }
 
 
     fun initTestDb() {
@@ -92,7 +101,9 @@ class RestaurantService(private val restaurantDao: RestaurantDao) {
                 "+7(495)123-12-34",
                 null,
                 "order@papajohns.ru",
-                20.0
+                20.0,
+                "",
+                "papaj"
         )
         restaurantDao.save(pjons)
         val pjonsid = findByName("Папа")[0].id!!
@@ -125,7 +136,9 @@ class RestaurantService(private val restaurantDao: RestaurantDao) {
                 "+7(495)123-12-34",
                 null,
                 "order@tastysushi.ru",
-                4.5
+                4.5,
+                "",
+                "sushi"
         )
         restaurantDao.save(sushi)
         val sushiId = findByName("вкусные")[0].id!!
@@ -159,7 +172,9 @@ class RestaurantService(private val restaurantDao: RestaurantDao) {
                 "+7(495)123-12-34",
                 null,
                 "order@tacobell.ru",
-                18.5
+                18.5,
+                "",
+                "tacobell"
         )
         restaurantDao.save(tacoBell)
         val tacoId = findByName("Тако")[0].id!!

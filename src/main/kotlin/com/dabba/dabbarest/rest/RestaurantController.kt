@@ -47,4 +47,17 @@ class RestaurantController (private val restaurantService: RestaurantService){
     @PostMapping("/file")
     @ApiOperation("Добавить файл")
     fun uploadfile(@RequestParam(value = "file", required = false) file: MultipartFile) = file.name
+
+    @GetMapping("/find/{id}")
+    @ApiOperation("Поиск ресторана по идентификатору/линку")
+    fun findById(@PathVariable("id") id: String): RestaurantOutDto {
+        if (id.matches(Regex("\\d+"))) {
+            return restaurantService.findById(id.toLong())
+        } else (return restaurantService.findByLink(id))
+
+    }
+
+    @PutMapping("/setradius/{id}")
+    @ApiOperation("Проставление радиуса ресторану по идентификатору")
+    fun setRaduis(@PathVariable("id") id: Long, @RequestParam("radius") radius: Double) = restaurantService.setRadius(id, radius)
 }

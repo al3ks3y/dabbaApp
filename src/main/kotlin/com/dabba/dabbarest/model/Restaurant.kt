@@ -26,8 +26,11 @@ data class Restaurant (
         var logoUrl: String?,
         var email: String,
         var serviceRadius: Double,
+        var coordinates: String,
         @OneToMany(cascade = [CascadeType.ALL])
-        var dishes: MutableList<Dish> = mutableListOf()
+        var dishes: MutableList<Dish> = mutableListOf(),
+        /** Строка для ссылки типа restaurant/dodo  */
+        var link: String?
 )
 {
     fun addDish(dish: Dish):Unit {
@@ -52,11 +55,13 @@ data class Restaurant (
             dishes = this.dishes.map { it.toDto() }.toMutableList(),
             email = this.email,
             serviceRadius = this.serviceRadius,
-            logoUrl = this.logoUrl
+            logoUrl = this.logoUrl,
+            coordinates = this.coordinates,
+            link = this.link
     )
 
-    constructor(name: String, address: String, kitchenType: KitchenType, openTime: String, closeTime: String, contactPhone: String, logoUrl: String?, email: String, serviceRadius: Double)
-            : this(0, "", "", KitchenType.RUSSIAN, "", "", "", "", "", 1.0, mutableListOf()) {
+    constructor(name: String, address: String, kitchenType: KitchenType, openTime: String, closeTime: String, contactPhone: String, logoUrl: String?, email: String, serviceRadius: Double, coordinates: String, link: String?)
+            : this(0, "", "", KitchenType.RUSSIAN, "", "", "", "", "", 1.0, "", mutableListOf(), null) {
         this.name = name
         this.address = address
         this.kitchenType = kitchenType
@@ -66,6 +71,8 @@ data class Restaurant (
         this.logoUrl = logoUrl
         this.email = email
         this.serviceRadius = serviceRadius
+        this.coordinates = coordinates
+        this.link = link
     }
     companion object {
         fun fromDto(dto: RestaurantInDto, fileName: String?): Restaurant = Restaurant(
@@ -75,9 +82,11 @@ data class Restaurant (
                 closeTime = dto.closeTime,
                 contactPhone = dto.contactPhone,
                 email = dto.email,
-                serviceRadius = dto.serviceRadius,
                 logoUrl = fileName,
-                kitchenType = KitchenType.fromString(dto.kitchenType)
+                kitchenType = KitchenType.fromString(dto.kitchenType),
+                coordinates = dto.coordinates,
+                serviceRadius = 0.0,
+                link = dto.link
         )
     }
 }
