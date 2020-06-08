@@ -34,7 +34,7 @@ class RestaurantService(private val restaurantDao: RestaurantDao) {
         return restaurantDao.findById(id).orElseThrow { NotFoundException("Ресторан с таким id не найден") }.toDto()
     }
 
-    fun add(restaurant: RestaurantInDto, multipartFile: MultipartFile?) = restaurantDao.save(Restaurant.fromDto(restaurant, uploadFileAndGetName(multipartFile))).id
+    fun add(restaurant: RestaurantInDto, multipartFile: MultipartFile?) = restaurantDao.save(Restaurant.fromDto(restaurant)).id
     fun addDish(dishInDto: DishInDto, multipartFile: MultipartFile?): Long? {
         val restaurant: Restaurant = restaurantDao.findById(dishInDto.restaurantId).orElseThrow { NotFoundException("Ресторан с таким id не найден") }
         restaurant.addDish(Dish.fromDto(dishInDto, uploadFileAndGetName(multipartFile)))

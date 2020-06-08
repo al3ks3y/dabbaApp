@@ -75,14 +75,14 @@ data class Restaurant (
         this.link = link
     }
     companion object {
-        fun fromDto(dto: RestaurantInDto, fileName: String?): Restaurant = Restaurant(
+        fun fromDto(dto: RestaurantInDto): Restaurant = Restaurant(
                 name = dto.name,
                 address = dto.address,
                 openTime = dto.openTime,
                 closeTime = dto.closeTime,
                 contactPhone = dto.contactPhone,
                 email = dto.email,
-                logoUrl = fileName,
+                logoUrl = dto.logoUrl,
                 kitchenType = KitchenType.fromString(dto.kitchenType),
                 coordinates = dto.coordinates,
                 serviceRadius = 0.0,
