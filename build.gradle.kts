@@ -44,7 +44,7 @@ dependencies {
 	implementation("io.springfox:springfox-swagger-ui:2.8.0")
 	testImplementation("junit:junit:4.13")
 	testImplementation("com.h2database:h2:1.4.191")
-	implementation("com.dropbox.core:dropbox-core-sdk:3.1.3")
+	implementation ("com.google.firebase:firebase-admin:6.14.0")
 }
 
 tasks.withType<Test> {
