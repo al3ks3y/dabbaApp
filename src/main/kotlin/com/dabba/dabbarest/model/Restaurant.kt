@@ -33,7 +33,7 @@ data class Restaurant (
         var link: String?
 )
 {
-    fun addDish(dish: Dish):Unit {
+    fun addDish(dish: Dish) {
         dish.restaurant=this
         this.dishes.add(dish)
     }
@@ -61,7 +61,7 @@ data class Restaurant (
     )
 
     constructor(name: String, address: String, kitchenType: KitchenType, openTime: String, closeTime: String, contactPhone: String, logoUrl: String?, email: String, serviceRadius: Double, coordinates: String, link: String?)
-            : this(0, "", "", KitchenType.RUSSIAN, "", "", "", "", "", 1.0, "", mutableListOf(), null) {
+            : this(0, "", "", KitchenType.RUSSIAN, "", "", "", "", "", 1.0, "", mutableListOf(), link) {
         this.name = name
         this.address = address
         this.kitchenType = kitchenType
@@ -75,14 +75,14 @@ data class Restaurant (
         this.link = link
     }
     companion object {
-        fun fromDto(dto: RestaurantInDto, fileName: String?): Restaurant = Restaurant(
+        fun fromDto(dto: RestaurantInDto): Restaurant = Restaurant(
                 name = dto.name,
                 address = dto.address,
                 openTime = dto.openTime,
                 closeTime = dto.closeTime,
                 contactPhone = dto.contactPhone,
                 email = dto.email,
-                logoUrl = fileName,
+                logoUrl = dto.logoUrl,
                 kitchenType = KitchenType.fromString(dto.kitchenType),
                 coordinates = dto.coordinates,
                 serviceRadius = 0.0,
@@ -132,7 +132,7 @@ data class Dish (
             extras = this.extras.map { it.toDto() }.toMutableList()
     )
 
-    fun addExtra(extra: Extra): Unit {
+    fun addExtra(extra: Extra) {
         extra.dish = this
         this.extras.add(extra)
     }
